@@ -1,29 +1,38 @@
-# Keypoints of Hand Detection and Image Annotation
+# Hand Keypoints Detection and Annotation
 
-This project uses MediaPipe to detect hand keypoints and annotate images with keypoints and skeletal connections. The system processes input images, detects hand landmarks, saves the results as a JSON file, and annotates images based on these keypoints.
+This repository provides a system for detecting hand keypoints using MediaPipe, saving the keypoints in a structured JSON format, and annotating images with these keypoints. The system includes multiple scripts that handle different stages of the image processing pipeline, such as keypoint extraction, CSV output, and JSON generation for annotation.
 
-## Overview
+## Features
 
-This project consists of two main steps:
-1. **Extract Hand Keypoints and Save as JSON**: Using MediaPipe, we detect 21 keypoints of hands in images and save the results in a structured JSON format.
-2. **Annotate Images Using JSON Data**: After generating the JSON data, we annotate the original images by drawing keypoints and skeletons on them.
+- **Keypoint Detection**: Detects 21 keypoints of hands using MediaPipe and processes images in `.png`, `.bmp`, `.jpg` formats.
+- **Image Annotation**: Annotates images by drawing keypoints and skeleton connections using the detected landmarks.
+- **CSV and JSON Outputs**: Saves keypoints in both CSV format and a structured JSON file.
+- **Multiple Processing Scripts**: Provides different scripts for extracting keypoints, saving them as CSV/JSON, and drawing annotations.
 
-### Features:
-- Detects up to 2 hands per image.
-- Outputs JSON file with 21 keypoints per hand.
-- Annotates images with red circles for keypoints and white lines for skeletal connections.
-  
+## Directory Structure
+
+```bash
+├── 21keypoints.py                # Extracts hand keypoints and saves them to a CSV file.
+├── 21keypointsTest.py            # Extracts keypoints, saves to CSV, and annotates images with keypoints.
+├── 21keypointswithjsonoutput.py  # Generates and saves keypoints data in JSON format.
+├── usejsonfordraw.py             # Annotates images based on JSON data.
+├── dataset_test/                 # Folder containing input images.
+├── dataset_test_keypoints/       # Folder for saving annotated images.
+├── hand_keypoints.csv            # CSV file to store extracted keypoints.
+└── hand_keypoints.json           # JSON file containing keypoints data.
+```
+
 ## Installation
 
-### 1. Dependencies
+### 1. Prerequisites
 
-You need Python and the following libraries to run the project:
+You need Python and the following libraries:
 
 - `opencv-python`
 - `mediapipe`
 - `json` (built-in)
 
-Install dependencies:
+Install the required dependencies:
 
 ```bash
 pip install opencv-python mediapipe
@@ -31,126 +40,65 @@ pip install opencv-python mediapipe
 
 ### 2. File Structure
 
+Your project should look like this:
+
 ```bash
-├── backend/
-│   ├── dataset/
-│   ├── env/
-│   ├── uploads/
-│   ├── keypoints_model.py
-│   ├── main.py
-│   ├── requirements.txt
-│   └── hand_keypoints.csv
-├── frontend/
-│   ├── src/
-│   ├── angular.json
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── README.md
+Demo_Project/
+├── 21keypoints.py
+├── 21keypointsTest.py
+├── 21keypointswithjsonoutput.py
+├── usejsonfordraw.py
+├── dataset_test/
+├── dataset_test_keypoints/
 └── README.md
 ```
 
-### 3. Running the Backend
+### 3. Running the Scripts
 
-1. Navigate to the `backend` directory.
-
-```bash
-cd backend
-```
-
-2. (Optional) Create a virtual environment.
+1. **Run `21keypoints.py`** to extract keypoints and save them in CSV format:
 
 ```bash
-python -m venv env
-source env/bin/activate  # For Windows: env\Scripts\activate
+python 21keypoints.py
 ```
 
-3. Install dependencies.
+2. **Run `21keypointsTest.py`** to extract keypoints, save them in CSV format, and annotate the images:
 
 ```bash
-pip install -r requirements.txt
+python 21keypointsTest.py
 ```
 
-4. Run the backend server.
+3. **Run `21keypointswithjsonoutput.py`** to generate and save keypoints data in JSON format:
 
 ```bash
-python main.py
+python 21keypointswithjsonoutput.py
 ```
 
-### 4. Running the Frontend
-
-1. Navigate to the `frontend` directory.
+4. **Run `usejsonfordraw.py`** to annotate images using the JSON data generated in the previous step:
 
 ```bash
-cd frontend
-```
-
-2. Install Node dependencies.
-
-```bash
-npm install
-```
-
-3. Run the frontend development server.
-
-```bash
-ng serve
-```
-
-4. Access the UI at `http://localhost:4200`.
-
-### 5. CORS Configuration
-Make sure CORS is allowed in FastAPI, as configured in `main.py`.
-
-```python
-origins = ["http://localhost:4200"]
+python usejsonfordraw.py
 ```
 
 ## Usage
 
-### 1. Uploading Images
+### 1. `21keypoints.py`
 
-Users can upload images via the frontend UI, either by dragging and dropping or selecting files. The images are sent to the backend for processing.
+This script processes images and saves the extracted keypoints in a CSV file. The CSV contains the filename, hand index, keypoint index, and the x, y, z coordinates of each keypoint.
 
-### 2. Annotating Images
+### 2. `21keypointsTest.py`
 
-Once uploaded, users click "Annotate," which triggers the backend to start the annotation process using the Mediapipe model. The backend detects hand keypoints and sends the annotated images back to the frontend.
+This script processes the images, draws the detected keypoints on the images, and saves the annotated images. It also writes the extracted keypoints to a CSV file.
 
-### 3. Annotated Images
+### 3. `21keypointswithjsonoutput.py`
 
-The annotated images, now with 21 keypoints marked with red circles and skeletons drawn between them, are displayed on the UI.
+This script generates and saves the keypoints data in a JSON format. The JSON structure contains the filename and keypoints for each image, organized by hand index.
 
-## Functions
+### 4. `usejsonfordraw.py`
 
-### `generate_json`
+This script reads the JSON file generated by `21keypointswithjsonoutput.py`, draws the keypoints on the original images, and saves the annotated images in the `dataset_test_keypoints` folder.
 
-**Purpose**: Extracts 21 hand keypoints using MediaPipe and saves them as a JSON file.
+## Notes
 
-**Input**: 
-- `dataset_folder`: Folder containing the images.
-- `json_output`: Output JSON file.
-
-**Output**: 
-- A JSON file containing hand keypoints for each image.
-
-### `draw_keypoints_from_json`
-
-**Purpose**: Annotates images by drawing red circles for keypoints and white lines for skeletal connections based on the JSON data.
-
-**Input**: 
-- `data`: JSON data generated by `generate_json`.
-- `dataset_folder`: Folder containing images.
-- `output_folder`: Folder to save the annotated images.
-
-**Output**: Annotated images with keypoints drawn on them.
-
-## Architecture
-
-- **Backend**: FastAPI server handling image uploads, keypoint extraction, and image annotation.
-- **AI Model**: MediaPipe used to detect hand keypoints in images.
-- **Frontend**: Web-based UI built with Angular for uploading images and displaying annotated results.
-
-## Future Enhancements
-
-- Real-time annotation previews.
-- Support for additional annotation models.
-- Optimized backend for large-scale datasets.
+- Ensure that the `dataset_test` folder contains the images you want to process.
+- The script will process images with the following file extensions: `.png`, `.jpg`, `.jpeg`, `.bmp`.
+- You can modify the dataset folder and output paths in the script if needed.
